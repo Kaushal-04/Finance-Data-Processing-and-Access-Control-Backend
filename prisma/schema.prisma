@@ -1,0 +1,32 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String            @id @default(uuid())
+  email        String            @unique
+  passwordHash String
+  role         String            @default("VIEWER") // VIEWER, ANALYST, ADMIN
+  status       String            @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  records      FinancialRecord[]
+}
+
+model FinancialRecord {
+  id          String   @id @default(uuid())
+  amount      Float
+  type        String   // INCOME, EXPENSE
+  category    String
+  date        DateTime
+  description String?
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
